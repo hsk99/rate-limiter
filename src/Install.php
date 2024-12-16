@@ -1,5 +1,5 @@
 <?php
-namespace Webman\NatClient;
+namespace Webman\RateLimiter;
 
 class Install
 {

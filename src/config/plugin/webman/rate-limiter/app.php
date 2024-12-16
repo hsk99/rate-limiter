@@ -1,7 +1,7 @@
 <?php
 return [
     'enable' => true,
-    'driver' => 'redis', // auto, apcu, memory, redis
+    'driver' => 'auto', // auto, apcu, memory, redis
     'stores' => [
         'redis' => [
             'connection' => 'default',

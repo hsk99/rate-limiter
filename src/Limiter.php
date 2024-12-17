@@ -84,17 +84,17 @@ class Limiter implements MiddlewareInterface
             switch ($annotation->key) {
                 case RateLimiterAnnotation::UID:
                     $uid = session('user.id', session()->getId());
-                    $key = "$prefix-$annotation->key-$uid";
+                    $key = "$prefix-$request->controller-$request->action-$annotation->key-$uid";
                     break;
                 case RateLimiterAnnotation::SID:
-                    $key = "$prefix-$annotation->key-" . session()->getId();
+                    $key = "$prefix-$request->controller-$request->action-$annotation->key-" . session()->getId();
                     break;
                 case RateLimiterAnnotation::IP:
                     $ip = $request->getRealIp();
                     if (in_array($ip, static::$ipWhiteList)) {
                         continue 2;
                     }
-                    $key = "$prefix-$annotation->key-$ip";
+                    $key = "$prefix-$request->controller-$request->action-$annotation->key-$ip";
                     break;
                 default:
                     if (is_array($annotation->key)) {

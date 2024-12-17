@@ -104,7 +104,8 @@ class Limiter implements MiddlewareInterface
                     }
             }
             if (static::$driver->increase($key, $annotation->ttl) > $annotation->limit) {
-                throw new RateLimitException($annotation->message);
+                $exceptionClass = $annotation->exception;
+                throw new $exceptionClass($annotation->message);
             }
         }
 

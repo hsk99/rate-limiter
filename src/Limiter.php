@@ -147,6 +147,10 @@ class Limiter implements MiddlewareInterface
      */
     public static function check(string $key, int $limit, int $ttl, string $message = 'Too Many Requests'): void
     {
+        if (!static::$initialized) {
+            static::init();
+        }
+
         $key = static::$prefix . '-' . $key;
         if (static::$driver->increase($key, $ttl) > $limit) {
             throw new RateLimitException($message);

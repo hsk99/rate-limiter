@@ -4,15 +4,17 @@ namespace Webman\RateLimiter\Driver;
 
 use RedisException;
 use support\Redis as RedisClient;
+use Workerman\Worker;
 use Workerman\Timer;
 
 class Redis implements DriverInterface
 {
     /**
+     * @param Worker|null $worker
      * @param string $connection
      * @throws RedisException
      */
-    public function __construct(protected string $connection)
+    public function __construct(?Worker $worker, protected string $connection)
     {
         Timer::add(24 * 60 * 60, function () {
             $this->clearExpire();

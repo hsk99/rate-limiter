@@ -26,6 +26,7 @@ use Webman\MiddlewareInterface;
 use Webman\Http\Response;
 use Webman\Http\Request;
 use Webman\RateLimiter\Annotation\RateLimiter as RateLimiterAnnotation;
+use Workerman\Worker;
 
 /**
  * Class Limiter
@@ -67,10 +68,6 @@ class Limiter implements MiddlewareInterface
      */
     public function process(Request $request, callable $handler) : Response
     {
-        if (!static::$initialized) {
-            static::init();
-        }
-
         if (!$request->controller || !method_exists($request->controller, $request->action)) {
             return $handler($request);
         }
@@ -113,10 +110,11 @@ class Limiter implements MiddlewareInterface
     }
 
     /**
+     * @param Worker|null $worker
      * @return void
      * @throws RedisException
      */
-    protected static function init(): void
+    public static function init(?Worker $worker): void
     {
         static::$initialized = true;
         static::$ipWhiteList = config('plugin.webman.rate-limiter.app.ip_whitelist', []);
@@ -130,9 +128,9 @@ class Limiter implements MiddlewareInterface
             }
         }
         static::$driver = match ($driver) {
-            'apcu' => new Apcu(),
-            'redis' => new Redis(static::$redisConnection),
-            default => new Memory(),
+            'apcu' => new Apcu($worker),
+            'redis' => new Redis($worker, static::$redisConnection),
+            default => new Memory($worker),
         };
     }
 
@@ -147,10 +145,6 @@ class Limiter implements MiddlewareInterface
      */
     public static function check(string $key, int $limit, int $ttl, string $message = 'Too Many Requests'): void
     {
-        if (!static::$initialized) {
-            static::init();
-        }
-
         $key = static::$prefix . '-' . $key;
         if (static::$driver->increase($key, $ttl) > $limit) {
             throw new RateLimitException($message);

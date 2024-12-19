@@ -16,9 +16,11 @@ class Redis implements DriverInterface
      */
     public function __construct(?Worker $worker, protected string $connection)
     {
-        Timer::add(24 * 60 * 60, function () {
-            $this->clearExpire();
-        });
+        if ($worker) {
+            Timer::add(24 * 60 * 60, function () {
+                $this->clearExpire();
+            });
+        }
         $this->clearExpire();
     }
 

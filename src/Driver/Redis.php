@@ -50,7 +50,7 @@ class Redis implements DriverInterface
         $keys = RedisClient::connection($this->connection)->keys('rate-limiter-*');
         foreach ($keys as $key) {
             if (!str_contains($key, 'rate-limiter-' . date('Y-m-d'))) {
-                $key = str_replace(config('redis.' . $this->connection . '.prefix'), '', $key);
+                $key = str_replace(config('redis.' . $this->connection . '.prefix', ''), '', $key);
                 RedisClient::connection($this->connection)->del($key);
             }
         }

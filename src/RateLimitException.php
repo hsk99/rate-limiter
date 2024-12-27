@@ -11,7 +11,7 @@ class RateLimitException extends BusinessException
     public function render(Request $request): ?Response
     {
         $code = $this->getCode() ?: 429;
-        $data = $this->data;
+        $data = $this->data ?? [];
         $message = $this->trans($this->getMessage(), $data);
         if ($request->expectsJson()) {
             $json = ['code' => $code, 'msg' => $message, 'data' => $data];
